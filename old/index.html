@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<body>
+
+<div ng-app="refresh-div" ng-controller="refresh_control">
+    <img ng-src="{{imageURL}}" />
+</div>
+
+<script>
+    var app = angular.module('refresh-div', [])
+        .controller('refresh_control', function ($scope, $http, $timeout) {
+            $scope.imageURL = 'https://s3-eu-west-1.amazonaws.com/lifeofpi/icam/current.jpg?_ts=' + new Date().getTime(); 
+
+            $scope.getImage = function () {
+                $http.get($scope.imageURL, {
+                    cache: false
+                }).success(function (data, status, headers, config) {
+                    $scope.imageURL = 'https://s3-eu-west-1.amazonaws.com/lifeofpi/icam/current.jpg?_ts=' + new Date().getTime();
+                });
+            };
+
+            $scope.intervalFunction = function () {
+                $timeout(function () {
+                    $scope.getImage();
+                    $scope.intervalFunction();
+                }, 1)
+            };
+
+            $scope.intervalFunction();
+        });
+</script>
+</body>
+</html>
